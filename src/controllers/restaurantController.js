@@ -6,6 +6,7 @@ import path from 'path';
 export const  addRestaurant = async (req,res) => {
     try {
         const { name, address, isOpen } = req.body;
+         const image = req.file.filename;
 
         if (!name || !address) {
           return res.status(400).json({ message: "Name and Address are required" });
@@ -15,7 +16,9 @@ export const  addRestaurant = async (req,res) => {
           name,
           address,
           isOpen: isOpen ?? true, 
-          menuItems: []
+          menuItems: [],
+          image,
+      rating: 0
         });
     
         const savedRestaurant = await newRestaurant.save();

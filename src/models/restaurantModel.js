@@ -6,6 +6,8 @@ const restaurantSchema = new mongoose.Schema({
     address: {type:String,required:true},
     isOpen: { type: Boolean, default: true },
     verified: { type: Boolean, default: false },
+    image: { type: String },
+    rating: { type: Number, default: 0 }, 
     menuItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
 
 

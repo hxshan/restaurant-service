@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage })
 
-  restaurantRouter.post('/add',addRestaurant);
+  restaurantRouter.post('/add',upload.single("image"),addRestaurant);
   restaurantRouter.get('/get/:id', getRestaurantById);
   restaurantRouter.get('/get',getRestaurants);
   restaurantRouter.get('/admin/unverified',getUnverifiedRestaurants);
