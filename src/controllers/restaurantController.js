@@ -32,6 +32,16 @@ export const  addRestaurant = async (req,res) => {
 
 }
 
+export const getRestaurantById = async (req, res) => {
+    try {
+      const restaurant = await restaurantModel.findById(req.params.id);
+      if (!restaurant) return res.status(404).json({ message: 'restaurant not found' });
+      res.status(200).json(restaurant);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+
 export const  getRestaurants = async (req,res) => {
     try {
         const restaurants = await restaurantModel
@@ -45,6 +55,56 @@ export const  getRestaurants = async (req,res) => {
       }
 
 }
+
+export const updateAvailability = async (req, res) => {
+    try {
+      const { isOpen } = req.body;
+      const restaurant = await restaurantModel.findByIdAndUpdate(
+        req.params.id,
+        { isOpen },
+        { new: true }
+      );
+      if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+  
+      res.status(200).json({
+        message: `Restaurant '${restaurant.name}' is now ${isOpen ? 'Open' : 'Closed'}`,
+        restaurant
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+export const verifyRestaurant = async (req, res) => {
+    try {
+      const { verified } = req.body;
+  
+      const restaurant = await restaurantModel.findByIdAndUpdate(
+        req.params.id,
+        { verified },
+        { new: true }
+      );
+  
+      if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
+  
+      res.status(200).json({
+        message: `Restaurant ${verified ? 'verified' : 'rejected'} successfully`,
+        restaurant
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  
+
+export const getUnverifiedRestaurants = async (req, res) => {
+    try {
+      const restaurants = await restaurantModel.find({ verified: false });
+      res.status(200).json(restaurants);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
 
 export const  addMenuItem = async (req,res) => {
     try {

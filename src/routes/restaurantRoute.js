@@ -1,6 +1,6 @@
 import express from 'express'
 import multer from 'multer'
-import { addMenuItem, addRestaurant, deleteMenuItem, getRestaurants, updateMenuItem } from '../controllers/restaurantController.js';
+import { addMenuItem, addRestaurant, deleteMenuItem, getRestaurantById, getRestaurants, getUnverifiedRestaurants, updateAvailability, updateMenuItem, verifyRestaurant } from '../controllers/restaurantController.js';
 
 
 const restaurantRouter = express.Router();
@@ -15,10 +15,14 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage })
 
-  restaurantRouter.post('/add',addRestaurant)
-  restaurantRouter.get('/get',getRestaurants)
-  restaurantRouter.post('/:id/menu',upload.single("image"),addMenuItem)
-  restaurantRouter.put('/update/:menuItemId',updateMenuItem)
-  restaurantRouter.delete('/delete-menu/:menuItemId',deleteMenuItem)
+  restaurantRouter.post('/add',addRestaurant);
+  restaurantRouter.get('/get/:id', getRestaurantById);
+  restaurantRouter.get('/get',getRestaurants);
+  restaurantRouter.get('/admin/unverified',getUnverifiedRestaurants);
+  restaurantRouter.put('/admin/verify/:id', verifyRestaurant);
+  restaurantRouter.put('/:id/availability',updateAvailability);
+  restaurantRouter.post('/:id/menu',upload.single("image"),addMenuItem);
+  restaurantRouter.put('/update/:menuItemId',updateMenuItem);
+  restaurantRouter.delete('/delete-menu/:menuItemId',deleteMenuItem);
 
   export default restaurantRouter
