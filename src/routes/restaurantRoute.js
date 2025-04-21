@@ -1,0 +1,24 @@
+import express from 'express'
+import multer from 'multer'
+import { addMenuItem, addRestaurant, deleteMenuItem, getRestaurants, updateMenuItem } from '../controllers/restaurantController.js';
+
+
+const restaurantRouter = express.Router();
+
+//Image storage engine
+const storage = multer.diskStorage({
+    destination: "uploads",
+    filename: (req, file, cb)=> {
+      return cb(null, `${Date.now()}${file.originalname}`)
+    }
+  })
+  
+  const upload = multer({ storage: storage })
+
+  restaurantRouter.post('/add',addRestaurant)
+  restaurantRouter.get('/get',getRestaurants)
+  restaurantRouter.post('/:id/menu',upload.single("image"),addMenuItem)
+  restaurantRouter.put('/update/:menuItemId',updateMenuItem)
+  restaurantRouter.delete('/delete-menu/:menuItemId',deleteMenuItem)
+
+  export default restaurantRouter
