@@ -23,7 +23,8 @@ export const  addRestaurant = async (req,res) => {
     
         const savedRestaurant = await newRestaurant.save();
     
-        res.status(201).json({
+        res.json({
+          success:true,
           message: `Restaurant '${savedRestaurant.name}' added successfully`,
           restaurant: savedRestaurant
         });
@@ -37,7 +38,8 @@ export const  addRestaurant = async (req,res) => {
 
 export const getRestaurantById = async (req, res) => {
     try {
-      const restaurant = await restaurantModel.findById(req.params.id);
+      // In your backend route handler
+      const restaurant = await restaurantModel.findById(req.params.id).populate('menuItems');
       if (!restaurant) return res.status(404).json({ message: 'restaurant not found' });
       res.status(200).json(restaurant);
     } catch (err) {
@@ -136,7 +138,8 @@ export const  addMenuItem = async (req,res) => {
     //   .findById(req.params.id)
     //   .populate('menuItems');
     
-        res.status(201).json({
+        res.json({
+            success:true,
             message: `Menu item '${name}' added successfully to restaurant '${restaurant.name}'`,
             menuItem: savedItem,
             restaurantId: restaurant._id
@@ -147,6 +150,23 @@ export const  addMenuItem = async (req,res) => {
       }
 
 }
+export const getMenuItem = async (req, res) => {
+  try {
+    const menuItemId = req.params.menuItemId;
+    const menuItem = await menuItemModel.findById(menuItemId);
+    
+    if (!menuItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+    
+    res.json({
+      success: true,
+      menuItem
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export const  updateMenuItem  = async (req,res) => {
     try {
