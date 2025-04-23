@@ -80,36 +80,36 @@ export const updateAvailability = async (req, res) => {
     }
   };
 
-export const verifyRestaurant = async (req, res) => {
-    try {
-      const { verified } = req.body;
+// export const verifyRestaurant = async (req, res) => {
+//     try {
+//       const { verified } = req.body;
   
-      const restaurant = await restaurantModel.findByIdAndUpdate(
-        req.params.id,
-        { verified },
-        { new: true }
-      );
+//       const restaurant = await restaurantModel.findByIdAndUpdate(
+//         req.params.id,
+//         { verified },
+//         { new: true }
+//       );
   
-      if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
+//       if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
   
-      res.status(200).json({
-        message: `Restaurant ${verified ? 'verified' : 'rejected'} successfully`,
-        restaurant
-      });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  };
+//       res.status(200).json({
+//         message: `Restaurant ${verified ? 'verified' : 'rejected'} successfully`,
+//         restaurant
+//       });
+//     } catch (err) {
+//       res.status(500).json({ error: err.message });
+//     }
+//   };
   
 
-export const getUnverifiedRestaurants = async (req, res) => {
-    try {
-      const restaurants = await restaurantModel.find({ verified: false });
-      res.status(200).json(restaurants);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  };
+// export const getUnverifiedRestaurants = async (req, res) => {
+//     try {
+//       const restaurants = await restaurantModel.find({ verified: false });
+//       res.status(200).json(restaurants);
+//     } catch (err) {
+//       res.status(500).json({ error: err.message });
+//     }
+//   };
 
 export const  addMenuItem = async (req,res) => {
     try {
@@ -168,20 +168,62 @@ export const getMenuItem = async (req, res) => {
   }
 };
 
-export const  updateMenuItem  = async (req,res) => {
-    try {
-        const updatedItem = await menuItemModel.findByIdAndUpdate(
-          req.params.menuItemId,
-          req.body,
-          { new: true }
-        );
-        if (!updatedItem) return res.status(404).json({ error: 'Menu item not found' });
-        res.json({message:"Menu Updated Successfully",updatedItem});
-      } catch (err) {
-        res.status(500).json({ error: err.message });
+// export const  updateMenuItem  = async (req,res) => {
+//     try {
+//         const updatedItem = await menuItemModel.findByIdAndUpdate(
+//           req.params.menuItemId,
+//           req.body,
+//           { new: true }
+//         );
+//         if (!updatedItem) return res.status(404).json({ error: 'Menu item not found' });
+//         res.json({message:"Menu Updated Successfully",updatedItem});
+//       } catch (err) {
+//         res.status(500).json({ error: err.message });
+//       }
+
+// }
+export const updateMenuItem = async (req, res) => {
+  try {
+      
+      const updateData = { ...req.body };
+      
+      
+      if (req.file) {
+          updateData.image = req.file.filename;
+          
+          
+          if (req.body.oldImage) {
+              const fs = require('fs');
+              const path = require('path');
+              const oldImagePath = path.join('uploads', req.body.oldImage);
+              
+              if (fs.existsSync(oldImagePath)) {
+                  fs.unlink(oldImagePath, (err) => {
+                      if (err) console.error('Error deleting old image:', err);
+                  });
+              }
+          }
       }
 
-}
+      const updatedItem = await menuItemModel.findByIdAndUpdate(
+          req.params.menuItemId,
+          updateData,
+          { new: true }
+      );
+
+      if (!updatedItem) {
+          return res.status(404).json({ error: 'Menu item not found' });
+      }
+
+      res.json({
+          message: "Menu Updated Successfully",
+          updatedItem
+      });
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+};
+
 
 export const  deleteMenuItem  = async (req,res) => {
     try {
