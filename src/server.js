@@ -17,7 +17,7 @@ app.use(cors(corsOptions));
 connectDB();
 
 //api endpoints
-app.use("/api/restaurant",restaurantRouter)
+app.use("/",restaurantRouter)
 app.use('/uploads', express.static('uploads'));
 
 
