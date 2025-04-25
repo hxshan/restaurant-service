@@ -5,7 +5,7 @@ import path from 'path';
 
 export const  addRestaurant = async (req,res) => {
     try {
-        const { name, address, isOpen } = req.body;
+        const { name, address, isOpen,rating } = req.body;
          const image = req.file.filename;
 
         if (!name || !address) {
@@ -16,9 +16,10 @@ export const  addRestaurant = async (req,res) => {
           name,
           address,
           isOpen: isOpen ?? true, 
+          rating: rating ?? 0,
           menuItems: [],
           image,
-      rating: 0
+    
         });
     
         const savedRestaurant = await newRestaurant.save();

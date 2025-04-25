@@ -1,7 +1,6 @@
 import express from 'express'
 import multer from 'multer'
 import { addMenuItem, addRestaurant, deleteMenuItem, getMenuItem, getRestaurantById, getRestaurants,updateAvailability, updateMenuItem} from '../controllers/restaurantController.js';
-import { mockAuth } from '../middleware/mockAuth.js';
 
 
 const restaurantRouter = express.Router();
@@ -16,13 +15,13 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage })
 
-  restaurantRouter.post('/add',mockAuth,upload.single("image"),addRestaurant);
+  restaurantRouter.post('/add',upload.single("image"),addRestaurant);
   restaurantRouter.get('/get/:id', getRestaurantById);
   restaurantRouter.get('/get',getRestaurants);
   //restaurantRouter.get('/admin/unverified',getUnverifiedRestaurants);
   //restaurantRouter.put('/admin/verify/:id',verifyRestaurant);
-  restaurantRouter.put('/:id/availability',mockAuth,updateAvailability);
-  restaurantRouter.post('/:id/menu',mockAuth,upload.single("image"),addMenuItem);
+  restaurantRouter.put('/:id/availability',updateAvailability);
+  restaurantRouter.post('/:id/menu',upload.single("image"),addMenuItem);
   restaurantRouter.get('/menu-item/:menuItemId',getMenuItem);
   restaurantRouter.put('/update/:menuItemId',upload.single("image"),updateMenuItem);
   restaurantRouter.delete('/delete-menu/:menuItemId',deleteMenuItem);
