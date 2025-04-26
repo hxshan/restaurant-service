@@ -10,8 +10,15 @@ const app= express()
 const PORT = process.env.PORT || 5003;
 
 //middleware
-app.use(express.json());
+
 app.use(cors(corsOptions));
+//app.options('*', cors(corsOptions)); // Enable CORS for all routes for OPTIONS requests
+app.use(cors({
+    ...corsOptions,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  }));
+app.use(express.json());
 
 //db connection
 connectDB();

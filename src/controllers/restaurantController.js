@@ -216,9 +216,12 @@ export const updateMenuItem = async (req, res) => {
           return res.status(404).json({ error: 'Menu item not found' });
       }
 
+      console.log("Received data:", req.body);
+      console.log("Received file:", req.file);
       res.json({
           message: "Menu Updated Successfully",
           updatedItem
+          
       });
   } catch (err) {
       res.status(500).json({ error: err.message });
