@@ -24,7 +24,7 @@ app.use(express.json());
 connectDB();
 
 //api endpoints
-app.use("/",restaurantRouter)
+app.use("/api/restaurant",restaurantRouter)
 app.use('/uploads', express.static('uploads'));
 
 

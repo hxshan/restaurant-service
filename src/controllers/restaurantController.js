@@ -2,8 +2,10 @@ import restaurantModel from "../models/restaurantModel.js"
 import menuItemModel from "../models/menuItemModel.js"
 import fs from 'fs'
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 export const  addRestaurant = async (req,res) => {
+ 
     try {
         const { name, address, isOpen,rating } = req.body;
          const image = req.file.filename;
@@ -11,6 +13,7 @@ export const  addRestaurant = async (req,res) => {
         if (!name || !address) {
           return res.status(400).json({ message: "Name and Address are required" });
         }
+        const ownerId = req.user.userId; 
     
         const newRestaurant = new restaurantModel({
           name,
@@ -32,7 +35,8 @@ export const  addRestaurant = async (req,res) => {
     
       } catch (error) {
         console.log(error);
-        res.json({success:false,message:"Error"})
+        return res.status(400).json({ success: false, message: "Bad Request" });
+
       }
 
 }
@@ -80,37 +84,6 @@ export const updateAvailability = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-
-// export const verifyRestaurant = async (req, res) => {
-//     try {
-//       const { verified } = req.body;
-  
-//       const restaurant = await restaurantModel.findByIdAndUpdate(
-//         req.params.id,
-//         { verified },
-//         { new: true }
-//       );
-  
-//       if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
-  
-//       res.status(200).json({
-//         message: `Restaurant ${verified ? 'verified' : 'rejected'} successfully`,
-//         restaurant
-//       });
-//     } catch (err) {
-//       res.status(500).json({ error: err.message });
-//     }
-//   };
-  
-
-// export const getUnverifiedRestaurants = async (req, res) => {
-//     try {
-//       const restaurants = await restaurantModel.find({ verified: false });
-//       res.status(200).json(restaurants);
-//     } catch (err) {
-//       res.status(500).json({ error: err.message });
-//     }
-//   };
 
 export const  addMenuItem = async (req,res) => {
     try {
@@ -169,65 +142,6 @@ export const getMenuItem = async (req, res) => {
   }
 };
 
-// export const  updateMenuItem  = async (req,res) => {
-//     try {
-//         const updatedItem = await menuItemModel.findByIdAndUpdate(
-//           req.params.menuItemId,
-//           req.body,
-//           { new: true }
-//         );
-//         if (!updatedItem) return res.status(404).json({ error: 'Menu item not found' });
-//         res.json({message:"Menu Updated Successfully",updatedItem});
-//       } catch (err) {
-//         res.status(500).json({ error: err.message });
-//       }
-
-// }
-export const updateMenuItem = async (req, res) => {
-  try {
-      
-      const updateData = { ...req.body };
-      
-      
-      if (req.file) {
-          updateData.image = req.file.filename;
-          
-          
-          if (req.body.oldImage) {
-              const fs = require('fs');
-              const path = require('path');
-              const oldImagePath = path.join('uploads', req.body.oldImage);
-              
-              if (fs.existsSync(oldImagePath)) {
-                  fs.unlink(oldImagePath, (err) => {
-                      if (err) console.error('Error deleting old image:', err);
-                  });
-              }
-          }
-      }
-
-      const updatedItem = await menuItemModel.findByIdAndUpdate(
-          req.params.menuItemId,
-          updateData,
-          { new: true }
-      );
-
-      if (!updatedItem) {
-          return res.status(404).json({ error: 'Menu item not found' });
-      }
-
-      console.log("Received data:", req.body);
-      console.log("Received file:", req.file);
-      res.json({
-          message: "Menu Updated Successfully",
-          updatedItem
-          
-      });
-  } catch (err) {
-      res.status(500).json({ error: err.message });
-  }
-};
-
 
 export const  deleteMenuItem  = async (req,res) => {
     try {
@@ -256,3 +170,52 @@ export const  deleteMenuItem  = async (req,res) => {
       }
 }
 
+
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+
+
+export const updateMenuItem = async (req, res) => {
+  try {
+    const updateData = { 
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      category: req.body.category
+    };
+
+    if (req.file) {
+      updateData.image = req.file.filename;
+      
+      if (req.body.oldImage) {
+        const oldImagePath = path.join(__dirname, '../uploads', req.body.oldImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+    }
+
+    const updatedItem = await menuItemModel.findByIdAndUpdate(
+      req.params.menuItemId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+   
+    const restaurant = await restaurantModel.findOne({ menuItems: updatedItem._id });
+
+    res.status(200).json({
+      success: true,
+      message: "Menu Updated Successfully",
+      updatedItem,
+      restaurantId: restaurant._id 
+    });
+    
+  } catch (err) {
+    res.status(500).json({ 
+      success: false,
+      error: err.message
+    });
+  }
+};
