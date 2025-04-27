@@ -5,15 +5,23 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 export const  addRestaurant = async (req,res) => {
- 
+  
     try {
-        const { name, address, isOpen,rating } = req.body;
+      console.log('Incoming request body:', req.body);
+        const { name, address, isOpen,rating,phoneNumbers, longitude, latitude } = req.body;
          const image = req.file.filename;
 
-        if (!name || !address) {
+        if (!name || !address,!phoneNumbers || !phoneNumbers.length) {
           return res.status(400).json({ message: "Name and Address are required" });
         }
-        const ownerId = req.user.userId; 
+        if (longitude && isNaN(longitude)) {
+          return res.status(400).json({ message: "Invalid longitude" });
+        }
+        if (latitude && isNaN(latitude)) {
+          return res.status(400).json({ message: "Invalid latitude" });
+        }
+        
+        //const ownerId = req.user.userId; 
     
         const newRestaurant = new restaurantModel({
           name,
@@ -22,11 +30,20 @@ export const  addRestaurant = async (req,res) => {
           rating: rating ?? 0,
           menuItems: [],
           image,
+          phoneNumbers,
+         //ownerId 
     
         });
+        if (longitude && latitude) {
+          newRestaurant.location = {
+            type: "Point",
+            coordinates: [parseFloat(longitude), parseFloat(latitude)]
+          };
+        }
+       
     
         const savedRestaurant = await newRestaurant.save();
-    
+  
         res.json({
           success:true,
           message: `Restaurant '${savedRestaurant.name}' added successfully`,
@@ -43,7 +60,7 @@ export const  addRestaurant = async (req,res) => {
 
 export const getRestaurantById = async (req, res) => {
     try {
-      // In your backend route handler
+     
       const restaurant = await restaurantModel.findById(req.params.id).populate('menuItems');
       if (!restaurant) return res.status(404).json({ message: 'restaurant not found' });
       res.status(200).json(restaurant);
@@ -87,7 +104,7 @@ export const updateAvailability = async (req, res) => {
 
 export const  addMenuItem = async (req,res) => {
     try {
-        const { name, description, price, category } = req.body;
+        const { name, description, price, category,size } = req.body;
         const image = req.file.filename;
     
         const newItem = new menuItemModel({
@@ -95,7 +112,8 @@ export const  addMenuItem = async (req,res) => {
           description,
           price,
           category,
-          image
+          image,
+          size
         });
     
         const savedItem = await newItem.save();
@@ -182,7 +200,8 @@ export const updateMenuItem = async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
-      category: req.body.category
+      category: req.body.category,
+      size: req.body.size
     };
 
     if (req.file) {
