@@ -6,10 +6,10 @@ const restaurantSchema = new mongoose.Schema({
   isOpen: { type: Boolean, default: true },
   image: { type: String },
   rating: { type: Number, default: 0 },
-  ownerId: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: false
+    required: true
   },
   menuItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
   

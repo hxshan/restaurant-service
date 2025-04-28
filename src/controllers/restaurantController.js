@@ -21,7 +21,7 @@ export const  addRestaurant = async (req,res) => {
           return res.status(400).json({ message: "Invalid latitude" });
         }
         
-        //const ownerId = req.user.userId; 
+        const userId = req.user.userId; 
     
         const newRestaurant = new restaurantModel({
           name,
@@ -31,7 +31,7 @@ export const  addRestaurant = async (req,res) => {
           menuItems: [],
           image,
           phoneNumbers,
-         //ownerId 
+          userId 
     
         });
         if (longitude && latitude) {
