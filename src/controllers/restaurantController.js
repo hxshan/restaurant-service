@@ -8,7 +8,10 @@ export const  addRestaurant = async (req,res) => {
   
     try {
       console.log('Incoming request body:', req.body);
-        const { name, address, isOpen,rating,phoneNumbers, longitude, latitude } = req.body;
+     
+  
+        const { name, address, isOpen,rating,longitude, latitude, userId} = req.body;
+        let { phoneNumbers } = req.body; 
          const image = req.file.filename;
 
         if (!name || !address,!phoneNumbers || !phoneNumbers.length) {
@@ -20,8 +23,11 @@ export const  addRestaurant = async (req,res) => {
         if (latitude && isNaN(latitude)) {
           return res.status(400).json({ message: "Invalid latitude" });
         }
-        
-        const userId = req.user.userId; 
+
+        if (!Array.isArray(phoneNumbers)) {
+          phoneNumbers = [phoneNumbers];
+        }
+     
     
         const newRestaurant = new restaurantModel({
           name,

@@ -7,7 +7,7 @@ const restaurantSchema = new mongoose.Schema({
   image: { type: String },
   rating: { type: Number, default: 0 },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'User',
     required: true
   },
