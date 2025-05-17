@@ -194,11 +194,7 @@ export const  deleteMenuItem  = async (req,res) => {
       }
 }
 
-
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-
 
 export const updateMenuItem = async (req, res) => {
   try {
